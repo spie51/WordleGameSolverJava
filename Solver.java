@@ -17,14 +17,7 @@ public class Solver{
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // String word;
-        // Set<Character> uniqueness
-        // for (int h = 0; h < wordList.size(); h++){
-        //     word = wordList.get(h);
-        // }
     }
-
 
     public void solveGame(){
         String recommendation = "steam";
@@ -35,6 +28,7 @@ public class Solver{
         HashSet<Character> guessedLetters = new HashSet<>();
         HashSet<Character> wrongLetters = new HashSet<>();
         HashMap<Character, Integer> correctLetters = new HashMap<>();
+        HashMap<Character, Integer> misplacedLetters = new HashMap<>();
         int totalRight = 0;            
 
         System.out.println("Welcome to spie51's Wordle Solver!");
@@ -49,6 +43,14 @@ public class Solver{
 
         Scanner sc = new Scanner(System.in);
 
+        System.out.println("Enter the word you used as your first guess. We recommend the word " + recommendation + " if you don't know where to start.");
+        recommendation = sc.nextLine().toLowerCase();
+
+        if(recommendation.length() != 5){
+            System.out.println("This word isn't valid, so we'll just use STEAM.");
+            recommendation = "steam";
+        }
+        
         while(wordList.size() > 1){
             System.out.println("Enter the clues you receive after inputting " + recommendation.toUpperCase());
             clue = sc.nextLine().toUpperCase();
@@ -60,7 +62,6 @@ public class Solver{
 
             for (int i = 0; i < clue.length(); i++){
                 char ch = clue.charAt(i);
-
                 if(ch == 'G'){
                     correctLetters.put(recommendation.charAt(i), i);
                     guessedLetters.add(recommendation.charAt(i));
@@ -68,6 +69,7 @@ public class Solver{
                 }
                 else if(ch == 'Y'){
                     guessedLetters.add(recommendation.charAt(i));
+                    misplacedLetters.put(recommendation.charAt(i), i);
                 }
                 else{
                     wrongLetters.add(recommendation.charAt(i));
@@ -75,7 +77,7 @@ public class Solver{
             }
 
             if(totalRight == 5){
-                System.out.println("Great! We successfully guessed the word " + recommendation.toUpperCase() + " in " + guessesNeeded + " guess(es)!");
+                System.out.println("Great! We successfully guessed the word " + recommendation.toUpperCase() + " in " + guessesNeeded + " guesses!");
                 sc.close();
                 return;
             }
@@ -111,26 +113,29 @@ public class Solver{
                         continue outerloop;
                     }
                 }
+                for(char m : misplacedLetters.keySet()){
+                    if(s.charAt(misplacedLetters.get(m)) == misplacedLetters.get(m)){
+                        wordList.remove(s);
+                        j--;
+                        continue outerloop;
+                    }
+                }
             }
 
             guessesNeeded++;
 
             if(wordList.size() > 1){
                 recommendation = wordList.get((int) Math.floor(Math.random() * wordList.size()));
-                System.out.println(wordList.size() + " guesses remaining. Our next guess is " + recommendation.toUpperCase());
-            }
-            
-           
+                System.out.println(wordList.size() + " possibilities remaining. Our next guess is " + recommendation.toUpperCase());
+            }      
         }
-
-
         if(wordList.size() == 1){
-            System.out.println("The word should be " + wordList.get(0).toUpperCase() + ". It only took " + guessesNeeded + "guess(es) to get here!");
+            System.out.println("The word should be " + wordList.get(0).toUpperCase() + ". It only took " + guessesNeeded + " guesses to get here!");
             sc.close();
             return;
         }
         else{
-            System.out.println("Sorry! The word doesn't seem to be in my Word Bank");
+            System.out.println("Sorry! The word doesn't seem to be in my Word Bank.");
         }
         
         sc.close();
